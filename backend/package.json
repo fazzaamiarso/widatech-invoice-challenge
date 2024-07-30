@@ -2,13 +2,13 @@
   "name": "widyatech-techincal-challenge",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx ./src/db/seed.ts"
   },
   "author": "Fazza Razaq Amiarso",
   "license": "ISC",
@@ -30,6 +30,7 @@
     "drizzle-kit": "^0.23.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.16.2",
     "typescript": "^5.5.3"
   }
 }
