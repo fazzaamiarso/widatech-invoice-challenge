@@ -1,5 +1,6 @@
 import { invoices } from "@db/schema";
 import { db } from "@db/setup";
+import { count } from "drizzle-orm";
 import { Request, Response } from "express";
 
 export const createInvoice = async (req: Request, res: Response) => {
@@ -38,7 +39,13 @@ export const getInvoices = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({ data: result, message: "success!" });
+    const invoicesCount = await db.select({ count: count() }).from(invoices);
+
+    return res.status(200).json({
+      data: result,
+      total: invoicesCount[0].count,
+      message: "success!",
+    });
   } catch (error: any) {
     return res
       .status(400)

@@ -125,7 +125,7 @@ function App() {
           <Button onClick={() => setIsOpen(true)}>Create Invoice</Button>
         </div>
       </header>
-      <main>
+      <main className="mx-auto w-11/12 py-4">
         <CardSection />
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetContent className="min-w-[500px]">
