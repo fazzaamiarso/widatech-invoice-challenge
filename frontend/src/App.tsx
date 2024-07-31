@@ -38,6 +38,7 @@ import { ChevronsUpDown } from "lucide-react";
 import { cn } from "./lib/utils";
 import { Toaster } from "./components/ui/toaster";
 import { useToast } from "./components/ui/use-toast";
+import CardSection from "./components/CardSection";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -125,7 +126,8 @@ function App() {
         </div>
       </header>
       <main>
-        <Sheet open={true} onOpenChange={setIsOpen}>
+        <CardSection />
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetContent className="min-w-[500px]">
             <SheetHeader>
               <SheetTitle>Create New Invoice</SheetTitle>

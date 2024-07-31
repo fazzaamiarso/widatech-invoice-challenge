@@ -36,7 +36,7 @@ Backend:
     - notes (optional)
     - multiple products sold
 
-- [ ] Autocomplete/Suggestion As user types
+- [x] Autocomplete/Suggestion As user types
 
   - Build as combobox and maybe pending UI while fetching
   - suggestion should include
