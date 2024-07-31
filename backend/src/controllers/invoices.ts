@@ -18,8 +18,15 @@ export const createInvoice = async (req: Request, res: Response) => {
 };
 
 export const getInvoices = async (req: Request, res: Response) => {
+  const page = req.query?.page ? Number(req.query.page) : 1;
+  const limit = req.query?.limit ? Number(req.query.limit) : undefined;
+  const offset = limit ? (page - 1) * limit : undefined;
+
   try {
     const result = await db.query.invoices.findMany({
+      offset,
+      limit,
+      orderBy: (invoices, { desc }) => [desc(invoices.date)], // order from newest invoices
       columns: { date: false },
       with: {
         invoiceItems: {
