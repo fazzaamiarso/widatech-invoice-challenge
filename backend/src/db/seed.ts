@@ -16,16 +16,16 @@ const main = async () => {
   const db = drizzle(client);
 
   console.log("🌱 SEEDING START");
-  try {
-    await db
-      .insert(salespersons)
-      .values([{ name: "James" }, { name: "Elon" }, { name: "Kamala" }])
-      .returning();
-  } catch (e: any) {
-    console.log(e?.message ?? "Something went wrong!");
-  } finally {
-    await client.end();
-  }
+  // try {
+  //   await db
+  //     .insert(salespersons)
+  //     .values([{ name: "James" }, { name: "Elon" }, { name: "Kamala" }])
+  //     .returning();
+  // } catch (e: any) {
+  //   console.log(e?.message ?? "Something went wrong!");
+  // } finally {
+  //   await client.end();
+  // }
   console.log("🏁 SEEDING END");
 };
 
