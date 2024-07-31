@@ -21,7 +21,7 @@ export const invoices = pgTable("invoice", {
 export const products = pgTable("product", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
   name: varchar("name", { length: 50 }),
-  price: integer("price"),
+  price: integer("price").notNull(),
 });
 
 export const invoiceItem = pgTable("invoice_item", {
