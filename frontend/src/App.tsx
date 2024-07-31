@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/command";
 import { ChevronsUpDown } from "lucide-react";
 import { cn } from "./lib/utils";
+import { Toaster } from "./components/ui/toaster";
+import { useToast } from "./components/ui/use-toast";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -77,6 +79,7 @@ const dummyProducts = [
 ];
 
 function App() {
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(createInvoiceSchema),
@@ -102,10 +105,19 @@ function App() {
 
   const onSubmit = (values: FormValues) => {
     console.log(values);
+
+    if (!form.formState.isValid) return;
+
+    toast({
+      title: "Invoice Created!",
+      description: new Date().toDateString(),
+      duration: 2000,
+    });
   };
 
   return (
     <>
+      <Toaster />
       <header className="">
         <div className="mx-auto flex w-11/12 justify-between py-4">
           <h1>Invoice POS</h1>
