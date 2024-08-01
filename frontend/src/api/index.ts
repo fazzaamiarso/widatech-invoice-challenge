@@ -17,6 +17,13 @@ export interface InvoiceChartResponse {
   paidAmount: number;
 }
 
+export interface InvoicePostPayload {
+  notes?: string;
+  customer: string;
+  salesperson: string;
+  products: Array<{ id: number; quantity: number }>;
+}
+
 const client = axios.create({
   baseURL: "http://localhost:3000/",
 });
@@ -28,7 +35,11 @@ export const fetchInvoices = async ({
   page?: number;
   limit?: number;
 }) => {
-  return client.get<{ data: InvoiceResponse[]; total: number }>("/invoices", {
+  return client.get<{
+    data: InvoiceResponse[];
+    total: number;
+    hasNextPage: boolean;
+  }>("/invoices", {
     params: {
       page,
       limit,
@@ -40,6 +51,14 @@ export const fetchInvoicesByPeriod = async (period: string) => {
   return client.get<{ data: InvoiceChartResponse[] }>("/invoices/period", {
     params: {
       period,
+    },
+  });
+};
+
+export const postInvoice = async (data: InvoicePostPayload) => {
+  return client.post("/invoices/create", data, {
+    headers: {
+      "Content-Type": "application/json",
     },
   });
 };

@@ -25,7 +25,7 @@ const main = async () => {
 
     await Promise.all([
       db.insert(products).values([
-        { id: 345, name: "primogems", price: 30 },
+        { id: 111, name: "primogems", price: 30 },
         { id: 222, name: "Geo Sigil", price: 20 },
         { id: 333, name: "Anemo Sigil", price: 10 },
         { id: 444, name: "Hydro Sigil", price: 40 },
@@ -63,9 +63,9 @@ const main = async () => {
     await db.insert(invoiceItem).values([
       { quantity: 2, invoiceId: 1, productId: 333 },
       { quantity: 1, invoiceId: 1, productId: 222 },
-      { quantity: 1, invoiceId: 2, productId: 345 },
+      { quantity: 1, invoiceId: 2, productId: 111 },
       { quantity: 4, invoiceId: 3, productId: 555 },
-      { quantity: 2, invoiceId: 3, productId: 345 },
+      { quantity: 2, invoiceId: 3, productId: 111 },
       { quantity: 10, invoiceId: 4, productId: 222 },
     ]);
   } catch (e: any) {

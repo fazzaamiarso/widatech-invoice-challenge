@@ -1,14 +1,27 @@
-import { invoices } from "@db/schema";
+import { invoiceItem, invoices } from "@db/schema";
 import { db } from "@db/setup";
 import { count, sql } from "drizzle-orm";
 import { Request, Response } from "express";
 
 export const createInvoice = async (req: Request, res: Response) => {
   // TODO: should validate and sanitize this later
-  const { notes, customer, salesperson } = req.body;
+  const { notes, customer, salesperson, products } = req.body;
 
   try {
-    await db.insert(invoices).values({ notes, salesperson, customer });
+    const result = await db
+      .insert(invoices)
+      .values({ notes, salesperson, customer })
+      .returning({ insertedId: invoices.id });
+
+    const invoiceId = result[0].insertedId;
+
+    await db.insert(invoiceItem).values(
+      products.map((p: any) => ({
+        invoiceId,
+        productId: p.id,
+        quantity: p.quantity,
+      }))
+    );
 
     return res.status(201).json({ message: "invoice successfully created!" });
   } catch (error: any) {
@@ -19,8 +32,10 @@ export const createInvoice = async (req: Request, res: Response) => {
 };
 
 export const getInvoices = async (req: Request, res: Response) => {
+  const ROW_LIMIT = 6;
+
   const page = req.query?.page ? Number(req.query.page) : 1;
-  const limit = req.query?.limit ? Number(req.query.limit) : undefined;
+  const limit = req.query?.limit ? Number(req.query.limit) : ROW_LIMIT;
   const offset = limit ? (page - 1) * limit : undefined;
 
   try {
@@ -41,9 +56,12 @@ export const getInvoices = async (req: Request, res: Response) => {
 
     const invoicesCount = await db.select({ count: count() }).from(invoices);
 
+    console.log(`HAS_NEXT_PAGE: ${invoicesCount[0].count / ROW_LIMIT > page}`);
+
     return res.status(200).json({
       data: result,
       total: invoicesCount[0].count,
+      hasNextPage: invoicesCount[0].count / ROW_LIMIT > page,
       message: "success!",
     });
   } catch (error: any) {

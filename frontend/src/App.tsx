@@ -34,12 +34,14 @@ import {
   CommandItem,
   Command,
 } from "@/components/ui/command";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Trash2 } from "lucide-react";
 import { cn } from "./lib/utils";
 import { Toaster } from "./components/ui/toaster";
 import { useToast } from "./components/ui/use-toast";
 import CardSection from "./components/CardSection";
 import TimeSeriesGraph from "./components/TimeSeriesGraph";
+import { useAppDispatch } from "./app/hooks";
+import { createInvoice, fetchInvoices } from "./app/invoiceSlice";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -58,29 +60,45 @@ type FormValues = z.infer<typeof createInvoiceSchema>;
 
 const dummyProducts = [
   {
-    id: 1,
-    name: "Invisibility Potion",
-    picture: "https://picsum.photos/40",
-    stock: 20,
-    price: 40,
-  },
-  {
-    id: 2,
-    name: "Health Potion",
-    picture: "https://picsum.photos/40",
-    stock: 3,
+    id: 111,
+    name: "primogems",
     price: 30,
+    stock: 5,
+    picture: "https://picsum.photos/40",
   },
   {
-    id: 3,
-    name: "Agility Potion",
+    id: 222,
+    name: "Geo Sigil",
+    price: 20,
+    stock: 5,
     picture: "https://picsum.photos/40",
-    stock: 6,
+  },
+  {
+    id: 333,
+    name: "Anemo Sigil",
     price: 10,
+    stock: 5,
+    picture: "https://picsum.photos/40",
+  },
+  {
+    id: 444,
+    name: "Hydro Sigil",
+    price: 40,
+    stock: 5,
+    picture: "https://picsum.photos/40",
+  },
+  {
+    id: 555,
+    name: "Dendro Sigil",
+    price: 55,
+    stock: 5,
+    picture: "https://picsum.photos/40",
   },
 ];
 
 function App() {
+  const dispatch = useAppDispatch();
+
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<FormValues>({
@@ -105,16 +123,23 @@ function App() {
     control: form.control,
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log(values);
+  const onSubmit = async (values: FormValues) => {
+    try {
+      await dispatch(createInvoice(values)).unwrap();
+      toast({
+        title: "Invoice Created!",
+        description: new Date().toDateString(),
+        duration: 2000,
+      });
 
-    if (!form.formState.isValid) return;
-
-    toast({
-      title: "Invoice Created!",
-      description: new Date().toDateString(),
-      duration: 2000,
-    });
+      await dispatch(fetchInvoices({})).unwrap();
+    } catch (error) {
+      toast({
+        title: "Failed to create Invoice",
+        description: "Something went wrong!",
+        duration: 2000,
+      });
+    }
   };
 
   return (
@@ -187,7 +212,7 @@ function App() {
                             return (
                               <div className="grid grid-cols-4 gap-2 rounded-md p-2 ring-1 ring-neutral-100">
                                 <FormItem className="col-span-2 flex flex-col">
-                                  <FormLabel>Product Name</FormLabel>
+                                  <FormLabel>Name</FormLabel>
                                   <Popover>
                                     <PopoverTrigger asChild>
                                       <FormControl>
@@ -273,9 +298,10 @@ function App() {
                                 </FormItem>
                                 <Button
                                   className="m-0 self-end"
+                                  variant="ghost"
                                   onClick={() => remove(idx)}
                                 >
-                                  Remove
+                                  <Trash2 className="size-5 text-neutral-500" />
                                 </Button>
                               </div>
                             );
