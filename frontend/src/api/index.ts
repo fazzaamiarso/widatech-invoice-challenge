@@ -12,6 +12,16 @@ export interface InvoiceResponse {
     };
   }[];
 }
+export interface InvoiceResponse {
+  id: number;
+  date: string;
+  invoiceItems: {
+    quantity: number;
+    product: {
+      price: number;
+    };
+  }[];
+}
 
 const client = axios.create({
   baseURL: "http://localhost:3000/",
@@ -28,6 +38,14 @@ export const fetchInvoices = async ({
     params: {
       page,
       limit,
+    },
+  });
+};
+
+export const fetchInvoicesByPeriod = async (period: string) => {
+  return client.get<{ data: InvoiceResponse[] }>("/invoices/period", {
+    params: {
+      period,
     },
   });
 };

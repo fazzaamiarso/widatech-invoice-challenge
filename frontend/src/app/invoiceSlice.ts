@@ -11,10 +11,32 @@ const fetchInvoices = createAsyncThunk(
   },
 );
 
+const dailyChart = Array.from({ length: 24 }).map((_, idx) => {
+  return { xAxis: String(idx), revenue: 0 };
+});
+
+const fetchInvoicesByPeriod = createAsyncThunk(
+  "invoices/fetchInvoicesByPeriod",
+  async (period: string) => {
+    const response = await invoiceAPI.fetchInvoicesByPeriod(period);
+
+    response.data.data.forEach((d, idx) => {
+      dailyChart[idx].revenue =
+        dailyChart[idx].revenue +
+        d.invoiceItems.reduce((acc, curr) => {
+          return acc + curr.product.price * curr.quantity;
+        }, 0);
+    });
+
+    return dailyChart;
+  },
+);
+
 const invoiceSlice = createSlice({
   name: "invoices",
   initialState: {
     invoices: [] as InvoiceResponse[],
+    chartInvoices: [] as { xAxis: string; revenue: number }[],
     totalInvoices: 0,
   },
   reducers: {},
@@ -23,13 +45,18 @@ const invoiceSlice = createSlice({
       state.invoices = action.payload.data;
       state.totalInvoices = action.payload.total;
     });
+    builder.addCase(fetchInvoicesByPeriod.fulfilled, (state, action) => {
+      state.chartInvoices = action.payload;
+    });
   },
 });
 
 export const selectInvoices = (state: RootState) => state.invoices.invoices;
 export const selectTotalInvoice = (state: RootState) =>
   state.invoices.totalInvoices;
+export const selectChartInvoices = (state: RootState) =>
+  state.invoices.chartInvoices;
 
-export { fetchInvoices };
+export { fetchInvoices, fetchInvoicesByPeriod };
 
 export default invoiceSlice.reducer;

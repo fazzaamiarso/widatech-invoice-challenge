@@ -13,7 +13,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  fetchInvoices,
+  fetchInvoicesByPeriod,
+  selectChartInvoices,
+} from "@/app/invoiceSlice";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
 const chartConfig = {
   revenue: {
@@ -48,7 +54,13 @@ const chartDataWeekly = [
 ];
 
 export default function TimeSeriesGraph() {
+  const dispatch = useAppDispatch();
+  const chartInvoices = useAppSelector(selectChartInvoices);
   const [period, setPeriod] = useState<"daily" | "monthly" | "weekly">("daily");
+
+  useEffect(() => {
+    dispatch(fetchInvoicesByPeriod(period)).unwrap();
+  }, [dispatch, period]);
 
   return (
     <Card className="space-y-6">
@@ -78,7 +90,7 @@ export default function TimeSeriesGraph() {
         >
           <LineChart
             accessibilityLayer
-            data={period === "daily" ? chartData : chartDataWeekly}
+            data={period === "daily" ? chartInvoices : chartDataWeekly}
             margin={{
               left: 12,
               right: 12,
@@ -93,7 +105,7 @@ export default function TimeSeriesGraph() {
               minTickGap={32}
               tickFormatter={(value) => {
                 return period === "daily"
-                  ? `0${value}:00`
+                  ? `${value.padStart("0", 1)}:00`
                   : `0${value}/${new Date().getMonth()}`;
               }}
             />
@@ -104,7 +116,7 @@ export default function TimeSeriesGraph() {
                   nameKey="revenue"
                   labelFormatter={(value) => {
                     return period === "daily"
-                      ? `0${value}:00`
+                      ? `${value.padStart("0", 1)}:00`
                       : `${new Date().toLocaleDateString("id-ID")}`;
                   }}
                 />
