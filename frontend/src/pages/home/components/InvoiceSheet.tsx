@@ -1,6 +1,7 @@
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -10,32 +11,20 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormMessage,
   Form,
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import {
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  Command,
-} from "@/components/ui/command";
-import { ChevronsUpDown, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAppDispatch } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
 import { createInvoice, fetchInvoices } from "@/app/invoiceSlice";
+import AutoComplete from "./AutoComplete";
+import TextInputWrapper from "./TextInputWrapper";
+import { useEffect } from "react";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -52,43 +41,18 @@ const createInvoiceSchema = z.object({
 
 type FormValues = z.infer<typeof createInvoiceSchema>;
 
-const dummyProducts = [
-  {
-    id: 111,
-    name: "primogems",
-    price: 30,
-    stock: 5,
-    picture: "https://picsum.photos/40",
-  },
-  {
-    id: 222,
-    name: "Geo Sigil",
-    price: 20,
-    stock: 5,
-    picture: "https://picsum.photos/40",
-  },
-  {
-    id: 333,
-    name: "Anemo Sigil",
-    price: 10,
-    stock: 5,
-    picture: "https://picsum.photos/40",
-  },
-  {
-    id: 444,
-    name: "Hydro Sigil",
-    price: 40,
-    stock: 5,
-    picture: "https://picsum.photos/40",
-  },
-  {
-    id: 555,
-    name: "Dendro Sigil",
-    price: 55,
-    stock: 5,
-    picture: "https://picsum.photos/40",
-  },
-];
+const formDefaultValues = {
+  customer: "",
+  salesperson: "",
+  notes: "",
+  products: [
+    {
+      id: -1,
+      name: "",
+      quantity: 1,
+    },
+  ],
+};
 
 type Props = {
   open: boolean;
@@ -102,16 +66,9 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createInvoiceSchema),
-    defaultValues: {
-      customer: "",
-      salesperson: "",
-      notes: "",
-    },
+    defaultValues: formDefaultValues,
   });
 
-  // 1. Able to add new field
-  // 2. display product input + autosuggest, stock, delete
-  // 3. as user types shows autosuggest
   const {
     fields: products,
     append,
@@ -132,6 +89,8 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
       });
 
       await dispatch(fetchInvoices({})).unwrap();
+
+      form.reset();
     } catch (error) {
       toast({
         title: "Failed to create Invoice",
@@ -141,49 +100,68 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
     }
   };
 
+  const onUpdateProduct = (params: {
+    id: number;
+    idx: number;
+    quantity: number;
+    name: string;
+  }) => {
+    update(params.idx, {
+      name: params.name,
+      quantity: params.quantity,
+      id: params.id,
+    });
+  };
+
+  const addProduct = () => {
+    append({ id: -1, quantity: 1, name: "" });
+  };
+
+  const removeProduct = (idx: number) => {
+    remove(idx);
+  };
+
   return (
-    <Sheet open={open} onOpenChange={toggleOpen}>
-      <SheetContent className="min-w-[500px]">
+    <Sheet
+      open={open}
+      onOpenChange={(val) => {
+        if (val === false) form.reset();
+        toggleOpen(val);
+      }}
+    >
+      <SheetContent className="mb-20 min-w-[500px]">
         <SheetHeader>
           <SheetTitle>Create New Invoice</SheetTitle>
+          <SheetDescription>
+            Fill out all necessary information
+          </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 py-12"
+          >
             <FormField
               control={form.control}
               name="customer"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Customer Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <TextInputWrapper label="Customer Name">
+                  <Input placeholder="Elon Musk" {...field} />
+                </TextInputWrapper>
               )}
             />
             <FormField
               control={form.control}
               name="salesperson"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Salesperson Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <TextInputWrapper label="Salesperson Name">
+                  <Input placeholder="Salvador Dali" {...field} />
+                </TextInputWrapper>
               )}
             />
             <div className="space-y-4">
               <div className="flex justify-between">
-                <div className="text-xl">Products</div>
-                <Button
-                  type="button"
-                  onClick={() => append({ id: -1, quantity: 0, name: "" })}
-                >
-                  Add new product
-                </Button>
+                <div className="text-xl">Items</div>
               </div>
 
               <div className="space-y-4">
@@ -198,65 +176,12 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
                           <div className="grid grid-cols-4 gap-2 rounded-md p-2 ring-1 ring-neutral-100">
                             <FormItem className="col-span-2 flex flex-col">
                               <FormLabel>Name</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant="outline"
-                                      role="combobox"
-                                      className={cn(
-                                        "justify-between",
-                                        !field.value && "text-muted-foreground",
-                                      )}
-                                    >
-                                      {field.value?.name.length
-                                        ? field.value.name
-                                        : "Select product"}
-                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[400px] p-0">
-                                  <Command>
-                                    <CommandInput placeholder="Search products..." />
-                                    <CommandList>
-                                      <CommandEmpty>
-                                        No product found.
-                                      </CommandEmpty>
-                                      <CommandGroup>
-                                        {dummyProducts.map((item) => {
-                                          return (
-                                            <CommandItem
-                                              value={item.name}
-                                              key={item.name}
-                                              className="grid grid-cols-3"
-                                              onSelect={() => {
-                                                update(idx, {
-                                                  id: item.id,
-                                                  name: item.name,
-                                                  quantity: product.quantity,
-                                                });
-                                              }}
-                                            >
-                                              <img
-                                                src={item.picture}
-                                                width={40}
-                                                height={40}
-                                                alt=""
-                                              />
-                                              <div className="grid">
-                                                <span>{item.name}</span>
-                                                <span>stock: {item.stock}</span>
-                                              </div>
-                                              <div>${item.price}</div>
-                                            </CommandItem>
-                                          );
-                                        })}
-                                      </CommandGroup>
-                                    </CommandList>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
+                              <AutoComplete
+                                fieldValue={field.value.name}
+                                index={idx}
+                                onSelectProduct={onUpdateProduct}
+                                quantity={product.quantity}
+                              />
                             </FormItem>
                             <FormItem className="flex flex-col">
                               <FormLabel>qty</FormLabel>
@@ -267,20 +192,22 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
                                   {...field}
                                   value={field.value?.quantity}
                                   onChange={(e) =>
-                                    update(idx, {
+                                    onUpdateProduct({
                                       id: field.value.id,
                                       name: field.value.name,
                                       quantity: Number(e.target.value),
+                                      idx,
                                     })
                                   }
-                                  min={0}
+                                  min={1}
                                 />
                               </FormControl>
                             </FormItem>
                             <Button
                               className="m-0 self-end"
                               variant="ghost"
-                              onClick={() => remove(idx)}
+                              disabled={products.length <= 1}
+                              onClick={() => removeProduct(idx)}
                             >
                               <Trash2 className="size-5 text-neutral-500" />
                             </Button>
@@ -291,25 +218,28 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
                   );
                 })}
               </div>
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full"
+                onClick={addProduct}
+              >
+                Add product
+              </Button>
             </div>
             <FormField
               control={form.control}
               name="notes"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Type your message here."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <TextInputWrapper label="Additional Notes (optional)">
+                  <Textarea placeholder="Type your message here." {...field} />
+                </TextInputWrapper>
               )}
             />
 
-            <Button type="submit">Create</Button>
+            <Button type="submit" className="w-full">
+              Save Invoice
+            </Button>
           </form>
         </Form>
       </SheetContent>
