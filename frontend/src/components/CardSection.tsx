@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/pagination";
 import { useSearchParams } from "react-router-dom";
 
-const ROW_LIMIT = 1;
+const ROW_LIMIT = 2;
 
 export default function CardSection() {
   const dispatch = useAppDispatch();

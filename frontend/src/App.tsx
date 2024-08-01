@@ -39,6 +39,7 @@ import { cn } from "./lib/utils";
 import { Toaster } from "./components/ui/toaster";
 import { useToast } from "./components/ui/use-toast";
 import CardSection from "./components/CardSection";
+import TimeSeriesGraph from "./components/TimeSeriesGraph";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -126,6 +127,7 @@ function App() {
         </div>
       </header>
       <main className="mx-auto w-11/12 py-4">
+        <TimeSeriesGraph />
         <CardSection />
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetContent className="min-w-[500px]">
