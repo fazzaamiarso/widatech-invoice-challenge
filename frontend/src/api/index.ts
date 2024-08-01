@@ -12,15 +12,9 @@ export interface InvoiceResponse {
     };
   }[];
 }
-export interface InvoiceResponse {
-  id: number;
+export interface InvoiceChartResponse {
   date: string;
-  invoiceItems: {
-    quantity: number;
-    product: {
-      price: number;
-    };
-  }[];
+  paidAmount: number;
 }
 
 const client = axios.create({
@@ -43,7 +37,7 @@ export const fetchInvoices = async ({
 };
 
 export const fetchInvoicesByPeriod = async (period: string) => {
-  return client.get<{ data: InvoiceResponse[] }>("/invoices/period", {
+  return client.get<{ data: InvoiceChartResponse[] }>("/invoices/period", {
     params: {
       period,
     },

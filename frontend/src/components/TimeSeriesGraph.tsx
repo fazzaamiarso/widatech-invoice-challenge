@@ -14,11 +14,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import {
-  fetchInvoices,
-  fetchInvoicesByPeriod,
-  selectChartInvoices,
-} from "@/app/invoiceSlice";
+import { fetchInvoicesByPeriod, selectChartInvoices } from "@/app/invoiceSlice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
 const chartConfig = {
@@ -31,35 +27,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const chartData = [
-  { xAxis: "0", revenue: 100 },
-  { xAxis: "1", revenue: 300 },
-  { xAxis: "2", revenue: 200 },
-  { xAxis: "3", revenue: 350 },
-  { xAxis: "4", revenue: 330 },
-  { xAxis: "5", revenue: 130 },
-  { xAxis: "7", revenue: 10 },
-  { xAxis: "8", revenue: 100 },
-];
-
-const chartDataWeekly = [
-  { xAxis: "0", revenue: 1000 },
-  { xAxis: "1", revenue: 3020 },
-  { xAxis: "2", revenue: 2030 },
-  { xAxis: "3", revenue: 2350 },
-  { xAxis: "4", revenue: 3330 },
-  { xAxis: "5", revenue: 1230 },
-  { xAxis: "7", revenue: 130 },
-  { xAxis: "8", revenue: 110 },
-];
-
 export default function TimeSeriesGraph() {
   const dispatch = useAppDispatch();
   const chartInvoices = useAppSelector(selectChartInvoices);
   const [period, setPeriod] = useState<"daily" | "monthly" | "weekly">("daily");
 
   useEffect(() => {
-    dispatch(fetchInvoicesByPeriod(period)).unwrap();
+    dispatch(fetchInvoicesByPeriod(period));
   }, [dispatch, period]);
 
   return (
@@ -90,7 +64,7 @@ export default function TimeSeriesGraph() {
         >
           <LineChart
             accessibilityLayer
-            data={period === "daily" ? chartInvoices : chartDataWeekly}
+            data={chartInvoices}
             margin={{
               left: 12,
               right: 12,
@@ -98,6 +72,7 @@ export default function TimeSeriesGraph() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
+              reversed={period !== "daily"}
               dataKey="xAxis"
               tickLine={false}
               axisLine={false}
@@ -105,19 +80,19 @@ export default function TimeSeriesGraph() {
               minTickGap={32}
               tickFormatter={(value) => {
                 return period === "daily"
-                  ? `${value.padStart("0", 1)}:00`
-                  : `0${value}/${new Date().getMonth()}`;
+                  ? `${value.padStart("0", 2)}:00`
+                  : `${value.padStart("0", 2)}/${Number(value) > new Date().getDate() ? new Date().getMonth() + 1 - 1 : new Date().getMonth() + 1}`;
               }}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="revenue"
+                  nameKey="xAxis"
                   labelFormatter={(value) => {
                     return period === "daily"
-                      ? `${value.padStart("0", 1)}:00`
-                      : `${new Date().toLocaleDateString("id-ID")}`;
+                      ? `${value.padStart("0", 2)}:00`
+                      : "Date";
                   }}
                 />
               }
