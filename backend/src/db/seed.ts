@@ -28,6 +28,8 @@ const main = async () => {
         { id: 345, name: "primogems", price: 30 },
         { id: 222, name: "Geo Sigil", price: 20 },
         { id: 333, name: "Anemo Sigil", price: 10 },
+        { id: 444, name: "Hydro Sigil", price: 40 },
+        { id: 555, name: "Dendro Sigil", price: 55 },
       ]),
       db.insert(invoices).values([
         {
@@ -42,6 +44,19 @@ const main = async () => {
           salesperson: "Katheryne",
           notes: "Lorem ipsum",
         },
+        {
+          id: 3,
+          customer: "Nahida",
+          salesperson: "Timmy",
+          notes: "Lorem ipsum",
+        },
+        {
+          id: 4,
+          customer: "Arlecchino",
+          salesperson: "Timmy",
+          notes: "Lorem ipsum",
+          date: new Date("2024-07-22"),
+        },
       ]),
     ]);
 
@@ -49,6 +64,9 @@ const main = async () => {
       { quantity: 2, invoiceId: 1, productId: 333 },
       { quantity: 1, invoiceId: 1, productId: 222 },
       { quantity: 1, invoiceId: 2, productId: 345 },
+      { quantity: 4, invoiceId: 3, productId: 555 },
+      { quantity: 2, invoiceId: 3, productId: 345 },
+      { quantity: 10, invoiceId: 4, productId: 222 },
     ]);
   } catch (e: any) {
     console.log(e?.message ?? "Something went wrong!");

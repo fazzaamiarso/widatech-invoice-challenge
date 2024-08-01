@@ -1,6 +1,6 @@
 import { invoices } from "@db/schema";
 import { db } from "@db/setup";
-import { count } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 import { Request, Response } from "express";
 
 export const createInvoice = async (req: Request, res: Response) => {
@@ -46,6 +46,54 @@ export const getInvoices = async (req: Request, res: Response) => {
       total: invoicesCount[0].count,
       message: "success!",
     });
+  } catch (error: any) {
+    return res
+      .status(400)
+      .json({ error: "Invalid Payload", message: error.message });
+  }
+};
+
+export const getInvoicesByPeriod = async (req: Request, res: Response) => {
+  const period = req.query?.period;
+
+  const periods = ["daily", "weekly", "monthly"] as const;
+  if (typeof period !== "string" || !periods.some((p) => p === period)) {
+    return res
+      .status(400)
+      .json({ message: `Bad Payload! "${period}" Not a valid period` });
+  }
+
+  const sqlInterval = {
+    daily: sql`${invoices.date} BETWEEN NOW() - INTERVAL '24 HOURS' AND NOW()`,
+    weekly: sql`${invoices.date} BETWEEN NOW() - INTERVAL '7 DAYS' AND NOW()`,
+    monthly: sql`${invoices.date} BETWEEN NOW() - INTERVAL '30 DAYS' AND NOW()`,
+  } as const;
+
+  try {
+    const result = await db.query.invoices.findMany({
+      columns: { date: true },
+      orderBy: (invoices, { asc }) => [asc(invoices.date)], // order from oldest invoices
+      where: sqlInterval[period as (typeof periods)[number]],
+      with: {
+        invoiceItems: {
+          columns: { quantity: true },
+          with: {
+            product: { columns: { price: true } },
+          },
+        },
+      },
+    });
+
+    const data = result.map((item) => {
+      return {
+        date: item.date,
+        paidAmount: item.invoiceItems.reduce((acc, curr) => {
+          return acc + curr.product.price * curr.quantity;
+        }, 0),
+      };
+    });
+
+    return res.status(200).json({ data, message: "success!" });
   } catch (error: any) {
     return res
       .status(400)
