@@ -4,7 +4,7 @@ import {
   selectHasNextPage,
   selectInvoices,
 } from "@/app/slice/invoice";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/pagination";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import InvoiceCard from "@/components/InvoiceCard";
+import CardSkeleton from "@/components/InvoiceCardSkeleton";
+
+const InvoiceCard = lazy(() => import("@/components/InvoiceCard"));
 
 export default function CardSection() {
   const dispatch = useAppDispatch();
@@ -63,10 +65,13 @@ export default function CardSection() {
         </Pagination>
       </div>
       <ul className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        {invoices.length &&
-          invoices.map((invoice) => (
-            <InvoiceCard key={invoice.id} invoice={invoice} />
-          ))}
+        {invoices.length > 0
+          ? invoices.map((invoice) => (
+              <Suspense fallback={<CardSkeleton />}>
+                <InvoiceCard key={invoice.id} invoice={invoice} />
+              </Suspense>
+            ))
+          : Array.from({ length: 6 }).map(() => <CardSkeleton />)}
       </ul>
     </div>
   );
