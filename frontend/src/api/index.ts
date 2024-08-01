@@ -1,3 +1,4 @@
+import { BASE_URL } from "@/utils/config";
 import axios from "axios";
 
 export interface InvoiceResponse {
@@ -25,7 +26,7 @@ export interface InvoicePostPayload {
 }
 
 const client = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: BASE_URL,
 });
 
 export const fetchInvoices = async ({

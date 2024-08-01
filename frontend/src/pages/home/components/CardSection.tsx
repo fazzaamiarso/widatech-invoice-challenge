@@ -3,9 +3,8 @@ import {
   fetchInvoices,
   selectHasNextPage,
   selectInvoices,
-} from "@/app/invoiceSlice";
+} from "@/app/slice/invoice";
 import { useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/pagination";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import InvoiceCard from "@/components/InvoiceCard";
 
 export default function CardSection() {
   const dispatch = useAppDispatch();
@@ -26,11 +26,11 @@ export default function CardSection() {
     ? Number(searchParams.get("page"))
     : 1;
 
+  const hasPrevPage = currentPage > 1;
+
   useEffect(() => {
     dispatch(fetchInvoices({ page: currentPage }));
   }, [currentPage, dispatch]);
-
-  console.log(`SKILL_ISSUE: ${hasNextPage}`);
 
   return (
     <div>
@@ -41,12 +41,12 @@ export default function CardSection() {
             <PaginationItem>
               <PaginationPrevious
                 to={
-                  currentPage > 1
+                  hasPrevPage
                     ? `?page=${currentPage === 1 ? currentPage : currentPage - 1}`
                     : "#"
                 }
                 className={cn(
-                  currentPage > 1 ? "" : "pointer-events-none opacity-50",
+                  hasPrevPage ? "" : "pointer-events-none opacity-50",
                 )}
               />
             </PaginationItem>
@@ -62,24 +62,11 @@ export default function CardSection() {
           </PaginationContent>
         </Pagination>
       </div>
-      <ul className="grid grid-cols-2 gap-4">
+      <ul className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         {invoices.length &&
-          invoices.map((invoice) => {
-            const totalPaidAmount = invoice.invoiceItems.reduce((acc, curr) => {
-              return acc + curr.product.price * curr.quantity;
-            }, 0);
-
-            return (
-              <Card key={invoice.id}>
-                <CardContent className="space-y-4 p-6">
-                  <div>Salesperson: {invoice.salesperson}</div>
-                  <div className="text-2xl font-bold">${totalPaidAmount}</div>
-                  <p>{invoice.customer}</p>
-                  <p>{invoice.notes}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
+          invoices.map((invoice) => (
+            <InvoiceCard key={invoice.id} invoice={invoice} />
+          ))}
       </ul>
     </div>
   );

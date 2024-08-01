@@ -14,8 +14,13 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import { fetchInvoicesByPeriod, selectChartInvoices } from "@/app/invoiceSlice";
+import {
+  fetchInvoicesByPeriod,
+  selectChartInvoices,
+} from "@/app/slice/invoice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+
+type Period = "daily" | "monthly" | "weekly";
 
 const chartConfig = {
   revenue: {
@@ -30,7 +35,7 @@ const chartConfig = {
 export default function TimeSeriesGraph() {
   const dispatch = useAppDispatch();
   const chartInvoices = useAppSelector(selectChartInvoices);
-  const [period, setPeriod] = useState<"daily" | "monthly" | "weekly">("daily");
+  const [period, setPeriod] = useState<Period>("daily");
 
   useEffect(() => {
     dispatch(fetchInvoicesByPeriod(period));
@@ -42,9 +47,7 @@ export default function TimeSeriesGraph() {
         <CardTitle>Revenue</CardTitle>
         <Select
           value={period}
-          onValueChange={(val) =>
-            setPeriod(val as "daily" | "monthly" | "weekly")
-          }
+          onValueChange={(val) => setPeriod(val as Period)}
         >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Select time range" />

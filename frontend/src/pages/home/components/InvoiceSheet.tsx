@@ -21,10 +21,9 @@ import { Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAppDispatch } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
-import { createInvoice, fetchInvoices } from "@/app/invoiceSlice";
+import { createInvoice, fetchInvoices } from "@/app/slice/invoice";
 import AutoComplete from "./AutoComplete";
 import TextInputWrapper from "./TextInputWrapper";
-import { useEffect } from "react";
 
 const createInvoiceSchema = z.object({
   customer: z.string().min(1, { message: "Field is required!" }).max(50),
@@ -41,7 +40,7 @@ const createInvoiceSchema = z.object({
 
 type FormValues = z.infer<typeof createInvoiceSchema>;
 
-const formDefaultValues = {
+const formDefaultValues: Partial<FormValues> = {
   customer: "",
   salesperson: "",
   notes: "",
@@ -91,6 +90,7 @@ export default function InvoiceSheet({ open, toggleOpen }: Props) {
       await dispatch(fetchInvoices({})).unwrap();
 
       form.reset();
+      toggleOpen(false);
     } catch (error) {
       toast({
         title: "Failed to create Invoice",
