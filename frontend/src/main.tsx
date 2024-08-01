@@ -1,15 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import Home from "@/pages/home";
 import "./index.css";
 import store from "./app/store";
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import DashboardLayout from "./components/layouts/DashboardLayout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <DashboardLayout />,
+    children: [{ index: true, element: <Home /> }],
   },
 ]);
 
