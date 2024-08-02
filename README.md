@@ -98,7 +98,7 @@ Frontend
 Fork and clone the repo, then go into the directory:
 
 ```bash
-cd wida-tech-challenge
+cd widatech-invoice-challenge
 ```
 
 #### Backend
