@@ -74,11 +74,13 @@ Frontend
 
 ### Limitations
 - On the frontend, the chart can only display data with no extra capabilities such as pan and zoom. While researching for the features, there's not a lot of resources that talk about how to implement the feature. It also requires a lot of calculations and planning. So, I decided not to implement it given the current time constraint.
+- For the product, it can add the same product multiple times. However, it still stored correctly in the database
 
 ### Improvements
 - The Data structure for Charts can still be improved for easier handling. It can maybe be done from backend in the sql query or Frontend with the transformations.
 - Data fetching should be done with wrapper like `tanstack-query` or `rtk-query` that provides caching layer. Especially, for dashboard applications the granular caching control can helps when dealing with large amount of data. It can definitely improve load and reduce call to the server.
 - Input for salesperson should be pre-defined selection with select since there can't be random person be the sales.
+- Implement stocks checking on the input and display total price of added products
 
 ### How to Start
 
