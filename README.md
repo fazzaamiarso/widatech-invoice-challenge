@@ -9,6 +9,7 @@
 - [Challenges](#challenges)
 - [Limitations](#limitations)
 - [Improvements](#improvements)
+- [gallery](#gallery)
 - [How to Start](#how-to-start)
 
 
@@ -64,7 +65,7 @@ For styling, the combo of Shadcn with Tailwind helped me tremendously boost my e
 
 ### Challenges
 Backend
-- I tried to use new technology, **Drizzle** as the ORM. It's approach of building queries and schema is very different from Prisma, which doesn't requires Foreign key to create relations between tables. After playing around with it, it was quite intuitive and similar to Native SQL with extra type-safety layer on top. However, there's still some quirks since it's still in v0.7.x by this time.
+- I tried to use new technology, **Drizzle** as the ORM. Its approach of building queries and schema is very different from Prisma, which doesn't requires Foreign key to create relations between tables. After playing around with it, it was quite intuitive and similar to Native SQL with extra type-safety layer on top. However, there's still some quirks since it's still in v0.7.x by this time.
 - Querying for the periodical/interval data was quite tricky. I'm able to solve it with Drizzle's **sql** function to write SQL.
 
 Frontend
@@ -81,6 +82,11 @@ Frontend
 - Data fetching should be done with wrapper like `tanstack-query` or `rtk-query` that provides caching layer. Especially, for dashboard applications the granular caching control can helps when dealing with large amount of data. It can definitely improve load and reduce call to the server.
 - Input for salesperson should be pre-defined selection with select since there can't be random person be the sales.
 - Implement stocks checking on the input and display total price of added products
+
+### Gallery 
+
+![sheet](/media/ss-sheet.png)
+![whole](/media/ss-whole.png)
 
 ### How to Start
 
