@@ -54,6 +54,7 @@ export default function DashboardLayout() {
                 {navigations.map((navigation) => {
                   return (
                     <Link
+                      key={navigation.label}
                       to={navigation.href}
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                     >
@@ -91,6 +92,7 @@ export default function DashboardLayout() {
                   {navigations.map((navigation) => {
                     return (
                       <Link
+                        key={navigation.label}
                         to={navigation.href}
                         className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                       >

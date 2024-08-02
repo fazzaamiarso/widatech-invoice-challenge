@@ -67,11 +67,13 @@ export default function CardSection() {
       <ul className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         {invoices.length > 0
           ? invoices.map((invoice) => (
-              <Suspense fallback={<CardSkeleton />}>
-                <InvoiceCard key={invoice.id} invoice={invoice} />
+              <Suspense key={invoice.id} fallback={<CardSkeleton />}>
+                <InvoiceCard invoice={invoice} />
               </Suspense>
             ))
-          : Array.from({ length: 6 }).map(() => <CardSkeleton />)}
+          : Array.from({ length: 6 }).map((_, idx) => (
+              <CardSkeleton key={idx} />
+            ))}
       </ul>
     </div>
   );

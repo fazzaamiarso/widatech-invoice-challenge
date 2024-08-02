@@ -89,7 +89,7 @@ export default function AutoComplete({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0">
+      <PopoverContent className="w-[300px] p-0">
         <Command>
           <CommandInput placeholder="Search products..." />
           <CommandList>
@@ -100,7 +100,7 @@ export default function AutoComplete({
                   <CommandItem
                     value={item.name}
                     key={item.name}
-                    className="grid grid-cols-3"
+                    className="flex items-center justify-between"
                     onSelect={() =>
                       onSelectProduct({
                         quantity,
@@ -110,12 +110,24 @@ export default function AutoComplete({
                       })
                     }
                   >
-                    <img src={item.picture} width={40} height={40} alt="" />
-                    <div className="grid">
-                      <span>{item.name}</span>
-                      <span>stock: {item.stock}</span>
+                    <div className="flex gap-4">
+                      <img
+                        src={item.picture}
+                        width={40}
+                        height={40}
+                        alt=""
+                        className="rounded-sm"
+                      />
+                      <div className="grid">
+                        <span className="">{item.name}</span>
+                        <span className="text-neutral-400">
+                          stock: {item.stock}
+                        </span>
+                      </div>
                     </div>
-                    <div>${item.price}</div>
+                    <div className="text-lg text-neutral-600">
+                      ${item.price}
+                    </div>
                   </CommandItem>
                 );
               })}

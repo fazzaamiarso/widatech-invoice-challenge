@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -19,6 +19,7 @@ import {
   selectChartInvoices,
 } from "@/app/slice/invoice";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { formatDayToThisMonth } from "@/utils/chart";
 
 type Period = "daily" | "monthly" | "weekly";
 
@@ -63,7 +64,7 @@ export default function TimeSeriesGraph() {
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[250px] w-full pl-0"
         >
           <LineChart
             accessibilityLayer
@@ -74,6 +75,12 @@ export default function TimeSeriesGraph() {
             }}
           >
             <CartesianGrid vertical={false} />
+            <YAxis
+              type="number"
+              domain={[0, "dataMax"]}
+              axisLine={false}
+              tickLine={false}
+            />
             <XAxis
               reversed={period !== "daily"}
               dataKey="xAxis"
@@ -83,8 +90,8 @@ export default function TimeSeriesGraph() {
               minTickGap={32}
               tickFormatter={(value) => {
                 return period === "daily"
-                  ? `${value.padStart("0", 2)}:00`
-                  : `${value.padStart("0", 2)}/${Number(value) > new Date().getDate() ? new Date().getMonth() + 1 - 1 : new Date().getMonth() + 1}`;
+                  ? `${value.padStart(2, "0")}:00`
+                  : `${value.padStart(2, "0")}/${formatDayToThisMonth(value)}`;
               }}
             />
             <ChartTooltip
@@ -94,8 +101,8 @@ export default function TimeSeriesGraph() {
                   nameKey="xAxis"
                   labelFormatter={(value) => {
                     return period === "daily"
-                      ? `${value.padStart("0", 2)}:00`
-                      : "Date";
+                      ? `${value.padStart(2, "0")}:00`
+                      : `${value.padStart(2, "0")}/${formatDayToThisMonth(value)}`;
                   }}
                 />
               }
